@@ -1,0 +1,197 @@
+{
+  "info": {
+    "_postman_id": "2049ea92-f9c0-4e38-abd0-f32cccf3bdd1",
+    "name": "Spring Boot - User Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "1925639"
+  },
+  "item": [
+    {
+      "name": "User APIs",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"User created successfully\", function () {\n    pm.response.to.have.status(201);\n});\n\nconst response = pm.response.json();\n\npm.test(\"Response indicates success\", function () {\n    pm.expect(response.success).to.eql(true);\n});\n\npm.test(\"User ID is returned\", function () {\n    pm.expect(response.data.id).to.exist;\n});\n\npm.collectionVariables.set(\"userId\", response.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Uma\",\n  \"lastName\": \"Patra\",\n  \"email\": \"uma.test@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\npm.test(\"Get Users returns HTTP 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst response = pm.response.json();\n\npm.test(\"Response indicates success\", function () {\n    pm.expect(response.success).to.eql(true);\n});\n\npm.test(\"User list is returned as an array\", function () {\n    pm.expect(response.data).to.be.an(\"array\");\n});\n\npm.test(\"Response contains a message\", function () {\n    pm.expect(response.message).to.exist;\n});\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET User By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\npm.test(\"Get User By ID returns HTTP 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst response = pm.response.json();\n\npm.test(\"Response indicates success\", function () {\n    pm.expect(response.success).to.eql(true);\n});\n\npm.test(\"Returned user ID matches requested ID\", function () {\n    pm.expect(response.data.id).to.eql(\n        Number(pm.collectionVariables.get(\"userId\"))\n    );\n});\n\npm.test(\"User email is returned\", function () {\n    pm.expect(response.data.email).to.exist;\n});\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/users/{{userId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\npm.test(\"Update User returns HTTP 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst response = pm.response.json();\n\npm.test(\"Response indicates success\", function () {\n    pm.expect(response.success).to.eql(true);\n});\n\npm.test(\"User ID remains unchanged\", function () {\n    pm.expect(response.data.id).to.eql(\n        Number(pm.collectionVariables.get(\"userId\"))\n    );\n});\n\npm.test(\"Updated email is saved\", function () {\n    pm.expect(response.data.email).to.eql(\"uma.patra@example.com\");\n});\n\npm.test(\"Updated timestamp is present\", function () {\n    pm.expect(response.data.updatedAt).to.exist;\n});\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Uma\",\n  \"lastName\": \"Patra\",\n  \"email\": \"uma.patra@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/users/{{userId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\npm.test(\"Delete User returns HTTP 204\", function () {\n    pm.response.to.have.status(204);\n});\n\npm.test(\"Delete response has an empty body\", function () {\n    pm.expect(pm.response.text()).to.be.empty;\n});\n\npm.test(\"User ID variable is available\", function () {\n    pm.expect(pm.collectionVariables.get(\"userId\")).to.exist;\n});\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/users/{{userId}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "userId",
+      "value": ""
+    }
+  ]
+}

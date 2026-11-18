@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build, Test and API Test
     runs-on: ubuntu-latest
 
     services:
@@ -39,8 +39,43 @@ jobs:
           cache: maven
 
       - name: Build and run tests
-        run: mvn -B clean verify
+        run: ./mvnw -B clean verify
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/springboot_db
           SPRING_DATASOURCE_USERNAME: uma
           SPRING_DATASOURCE_PASSWORD: postgres
+
+      - name: Start Spring Boot application
+        run: |
+          nohup java -jar target/*.jar > app.log 2>&1 &
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/springboot_db
+          SPRING_DATASOURCE_USERNAME: uma
+          SPRING_DATASOURCE_PASSWORD: postgres
+
+      - name: Wait for application to start
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://localhost:8080/api/users > /dev/null; then
+              echo "Spring Boot application is ready!"
+              exit 0
+            fi
+            echo "Waiting for application..."
+            sleep 5
+          done
+
+          echo "Application failed to start. Application logs:"
+          cat app.log
+          exit 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman API tests
+        run: |
+          newman run postman/user-management-api.postman_collection.json
